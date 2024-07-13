@@ -1,4 +1,4 @@
-from .database import customer_collection
+from .database import customer_collection,account_collection
 from .models import CustomerModel
 from .models import LogInModel
 from .models import UpdatePass,EmailParams,id_clinet
@@ -118,6 +118,30 @@ async def number_account():
     if account_data is None:
         return account
     
+
+
+
+async def add_new_bank_account(num_account):
+    new_account={
+        "account_number":num_account,
+        "balance":0.0,
+        "movements":{
+            
+        }
+    }
+    
+    result = await account_collection.insert_one(new_account)
+    if result.inserted_id:
+        return True
+    else:
+        return False
+    
+
+
+
+
+
+
 async def create_new_bank_account(id:id_clinet)-> dict:
     account=await number_account()
     user_data=await customer_collection.find_one({"_id": ObjectId(id.id)})
@@ -128,8 +152,15 @@ async def create_new_bank_account(id:id_clinet)-> dict:
        {"_id": ObjectId(id.id)},
        {"$set": {"accounts": current_accounts}}
     )
+    
     if result.modified_count > 0:
         print("se modifico")
+        new_account=await add_new_bank_account(account)
+        if new_account:
+            return {"CODE":"NEW_ACCOUNT_CREATED"}
+        else:
+            return {"CODE":"NEW_ACCOUNT_DONT_CREATED"}
+        
     else:
         print("dea a malas")
     
