@@ -1,11 +1,15 @@
 from .database import customer_collection
 from .models import CustomerModel
 from .models import LogInModel
-from .models import UpdatePass,EmailParams
+from .models import UpdatePass,EmailParams,id_clinet
 from bson import ObjectId
 import bcrypt
 import resend
 from fastapi import FastAPI, HTTPException, Depends
+import os
+import random
+
+
 
 async def add_customer(customer_data: CustomerModel) -> dict:
     # Hashear la contraseña antes de almacenarla
@@ -91,14 +95,43 @@ async def update_password(data: UpdatePass) -> dict:
 
 
 async def send_email(params: EmailParams) -> dict:
+    resend.api_key = os.environ["RESEND_API_KEY"]
+    code=random.randint(100000, 999999)
     try:
         email_params: resend.Emails.SendParams = {
-            "from": params.from_email,
+            "from": "onboarding@resend.dev",
             "to": params.to,
-            "subject": params.subject,
-            "html": params.html,
+            "subject": "code_verify",
+            "html": f"<strong>{code}</strong>",
         }
-        email: resend.Email = await resend.Emails.send(email_params)
-        return {"status": "success", "email_id": email.id}
+        email: resend.Email = resend.Emails.send(email_params)
+        return {"status": "success", "email_id": email}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+async def number_account():
+    account=random.randint(10000000, 99999999)
+    query={
+        "numero_cuenta": account
+    }
+    account_data = await customer_collection.find_one(query)
+    if account_data is None:
+        return account
+    
+async def create_new_bank_account(id:id_clinet)-> dict:
+    account=await number_account()
+    user_data=await customer_collection.find_one({"_id": ObjectId(id.id)})
+    current_accounts=user_data['accounts']
+    current_accounts.append(account)
+    user_data['accounts']=current_accounts
+    result = await customer_collection.update_one(
+       {"_id": ObjectId(id.id)},
+       {"$set": {"accounts": current_accounts}}
+    )
+    if result.modified_count > 0:
+        print("se modifico")
+    else:
+        print("dea a malas")
+    
+
+    
