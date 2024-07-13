@@ -13,3 +13,4 @@ except ConnectionFailure:
 
 database = client.BuhoBanco
 customer_collection = database.get_collection("Clientes")
+account_collection = database.get_collection("CuentasBancarias")

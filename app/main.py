@@ -1,10 +1,12 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from .models import CustomerModel, LogInModel,UpdatePass,EmailParams
-from .crud import add_customer,update_customer,checkData, update_password, send_email
+from .models import CustomerModel, LogInModel,UpdatePass,EmailParams,id_clinet
+from .crud import add_customer,update_customer,checkData, update_password, send_email,create_new_bank_account
 from fastapi.encoders import jsonable_encoder
 from .verifyData import verifyDataCI, verifyDataEmail,verifyDataUser, verify_password_requirements
+import os
+import resend
 
 
 
@@ -97,3 +99,14 @@ async def change_password(new_data:UpdatePass):
 @app.post("/send_email")
 async def send_mail(params: EmailParams):
     return await send_email(params)
+
+@app.post("/create_bank_account")
+async def send_mail(id: id_clinet):
+    await create_new_bank_account(id)
+    print(id)
+    responce={
+        "valor":"a"
+    }
+    responce=jsonable_encoder(responce)
+    return JSONResponse(status_code=400, content=responce)
+    
