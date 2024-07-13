@@ -1,9 +1,11 @@
 from .database import customer_collection
 from .models import CustomerModel
 from .models import LogInModel
-from .models import UpdatePass
+from .models import UpdatePass,EmailParams
 from bson import ObjectId
 import bcrypt
+import resend
+from fastapi import FastAPI, HTTPException, Depends
 
 async def add_customer(customer_data: CustomerModel) -> dict:
     # Hashear la contraseña antes de almacenarla
@@ -86,3 +88,17 @@ async def update_password(data: UpdatePass) -> dict:
     )
     
     return {"message": "Contraseña cambiada exitosamente"}
+
+
+async def send_email(params: EmailParams) -> dict:
+    try:
+        email_params: resend.Emails.SendParams = {
+            "from": params.from_email,
+            "to": params.to,
+            "subject": params.subject,
+            "html": params.html,
+        }
+        email: resend.Email = await resend.Emails.send(email_params)
+        return {"status": "success", "email_id": email.id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
