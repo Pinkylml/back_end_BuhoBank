@@ -102,11 +102,8 @@ async def send_mail(params: EmailParams):
 
 @app.post("/create_bank_account")
 async def send_mail(id: id_clinet):
-    await create_new_bank_account(id)
+    responce=await create_new_bank_account(id)
     print(id)
-    responce={
-        "valor":"a"
-    }
     responce=jsonable_encoder(responce)
-    return JSONResponse(status_code=400, content=responce)
+    return JSONResponse(status_code=200, content=responce)
     
