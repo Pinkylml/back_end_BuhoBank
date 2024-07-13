@@ -82,13 +82,13 @@ async def change_password(new_data:UpdatePass):
     # Verificar que la nueva contraseña cumpla con los requisitos mínimos
     is_valid, message = verify_password_requirements(new_data.new_password)
     if not is_valid:
-        return JSONResponse(status_code=400, content={"message": message, "error_code": "INVALID_NEW_PASSWORD"})
+        return JSONResponse(status_code=400, content={ "code": "INVALID_NEW_PASSWORD",message:"code "})
 
     try:
         result = await update_password(new_data)
-        if "error_code" in result:
-            if result["error_code"] == "INCORRECT_CURRENT_PASSWORD":
-                return JSONResponse(status_code=400, content={"message": "La contraseña actual es incorrecta", "error_code": "INCORRECT_CURRENT_PASSWORD"})
+        if "code" in result:
+            if result["code"] == "INCORRECT_CURRENT_PASSWORD":
+                return JSONResponse(status_code=400, content={ "code": "INCORRECT_CURRENT_PASSWORD"})
         return JSONResponse(status_code=200, content=result)
     except ValueError as e:
         return JSONResponse(status_code=400, content={"message": str(e)})

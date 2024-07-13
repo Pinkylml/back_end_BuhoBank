@@ -70,11 +70,11 @@ async def update_password(data: UpdatePass) -> dict:
     # Buscar el usuario por su ID
     customer = await customer_collection.find_one({"_id": ObjectId(data.user_id)})
     if not customer:
-        raise ValueError("Usuario no encontrado")
+        return {"code": "USER_NOT_FOUND"}
 
     # Verificar si la contraseña actual es correcta
     if not bcrypt.checkpw(data.current_password.encode('utf-8'), customer['password'].encode('utf-8')):
-        return {"error_code": "INCORRECT_CURRENT_PASSWORD"}
+        return {"code": "INCORRECT_CURRENT_PASSWORD"}
 
     # Hashear la nueva contraseña antes de almacenarla
     hashed_password = bcrypt.hashpw(data.new_password.encode('utf-8'), bcrypt.gensalt())

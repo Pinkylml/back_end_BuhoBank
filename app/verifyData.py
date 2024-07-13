@@ -55,16 +55,16 @@ def verifyCredentias(user_data):
 def verify_password_requirements(password: str) -> bool:
     # Requisitos mínimos: al menos 8 caracteres, una letra mayúscula, una letra minúscula, un dígito y un carácter especial
     if len(password) < 8:
-        return False, "La contraseña debe tener al menos 8 caracteres"
+        return False, "INVALID_PASSWORD_LENGTH"
     if not re.search(r"[A-Z]", password):
-        return False, "La contraseña debe tener al menos una letra mayúscula"
+        return False,"MISSING_UPPERCASE"
     if not re.search(r"[a-z]", password):
-        return False, "La contraseña debe tener al menos una letra minúscula"
+        return False, "MISSING_LOWERCASE"
     if not re.search(r"\d", password):
-        return False, "La contraseña debe tener al menos un dígito"
+        return False, "MISSING_DIGIT"
     if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
-        return False, "La contraseña debe tener al menos un carácter especial"
-    return True, ""
+        return False, "MISSING_SPECIAL_CHARACTER"
+    return True, "VALID_PASSWORD"
     
 
     
