@@ -24,6 +24,8 @@ async def add_customer(customer_data: CustomerModel) -> dict:
         
         # Verificar si la inserción fue exitosa
         if result.inserted_id:
+            account_model = id_clinet(id=str(result.inserted_id))
+            await create_new_bank_account(account_model)
             return True
         else:
             return False
