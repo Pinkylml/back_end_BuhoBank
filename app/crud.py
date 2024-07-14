@@ -54,6 +54,23 @@ async def update_customer(credentials: CustomerModel) -> dict:
     else:
         return False
 
+async def fetchAcounts(list_accounts):
+    accounts_data=[]
+    for account in list_accounts:
+        query={
+            "account_number":account
+        }
+
+        account_data=await account_collection.find_one(query)
+        del account_data['_id']
+        if accounts_data is None:
+            print("No existe la cuenta")
+        else:
+            accounts_data.append(account_data)
+    return accounts_data
+
+
+
 
 
 async def checkData(credentials: LogInModel) -> bool:
@@ -68,8 +85,11 @@ async def checkData(credentials: LogInModel) -> bool:
         print(f"Usuario {credentials.user} encontrado con exito")
     
     hashed_password=user.get('password','')
+    accounts_data_response=await fetchAcounts(user['accounts'])
+    print(accounts_data_response)
     if bcrypt.checkpw(credentials.password.encode('utf-8'), hashed_password.encode('utf-8')):
-        return True,user['accounts']
+
+        return True,accounts_data_response,user['_id']
     else:
         return False
     
@@ -138,9 +158,6 @@ async def add_new_bank_account(num_account):
     else:
         return False
     
-
-
-
 
 
 

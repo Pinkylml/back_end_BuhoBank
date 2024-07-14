@@ -57,20 +57,23 @@ async def create_customer(customer: CustomerModel):
 
 @app.post("/login", response_model=dict)
 async def logIn (Credentials: LogInModel):
-    authenticate,bank_accounts = await checkData(Credentials)
+    authenticate,bank_accounts,id = await checkData(Credentials)
+    id=str(id)
+    print(id)
     if authenticate:
         if len(bank_accounts)>0:
             response_data = {
                 "authenticated": authenticate,
                 "code":"HAVE_ACCOUNTS",
+                "id":id,
                 "accounts_list":bank_accounts
             }
           
         else:
-           
             response_data = {
             "authenticated": authenticate,
-            "code":"NO_HAVE_ACCOUNTS"
+            "code":"NO_HAVE_ACCOUNTS",
+           "id":id,
             }
         # Convierte el diccionario en JSON serializable
         response_json = jsonable_encoder(response_data)
@@ -102,6 +105,9 @@ async def send_mail(params: EmailParams):
 
 @app.post("/create_bank_account")
 async def send_mail(id: id_clinet):
+    print(id)
+    print(type(id))
+    print(type(id.id))
     responce=await create_new_bank_account(id)
     print(id)
     responce=jsonable_encoder(responce)
