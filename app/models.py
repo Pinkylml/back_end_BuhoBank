@@ -34,3 +34,12 @@ class EmailParams(BaseModel):
     
 class id_clinet(BaseModel):
     id: str
+    
+
+class TransferData(BaseModel):
+    selectedAccount: str
+    amount: float
+    beneficiary: str
+    accountNumber: str
+    description: str = None
+    notification: str = None
