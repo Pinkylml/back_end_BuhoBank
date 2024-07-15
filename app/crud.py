@@ -89,7 +89,6 @@ async def checkData(credentials: LogInModel) -> bool:
     accounts_data_response=await fetchAcounts(user['accounts'])
     print(accounts_data_response)
     if bcrypt.checkpw(credentials.password.encode('utf-8'), hashed_password.encode('utf-8')):
-
         return True,accounts_data_response,user['_id']
     else:
         return False
@@ -102,6 +101,7 @@ async def update_password(data: UpdatePass) -> dict:
         return {"code": "USER_NOT_FOUND"}
 
     # Verificar si la contraseña actual es correcta
+    print("veamos contraseña actual", data.current_password)
     if not bcrypt.checkpw(data.current_password.encode('utf-8'), customer['password'].encode('utf-8')):
         return {"code": "INCORRECT_CURRENT_PASSWORD"}
 
@@ -114,7 +114,7 @@ async def update_password(data: UpdatePass) -> dict:
         {"$set": {"password": hashed_password.decode('utf-8')}}
     )
     
-    return {"message": "Contraseña cambiada exitosamente"}
+    return {"code": "PASSWORD_CHANGED"}
 
 
 async def send_email(params: EmailParams) -> dict:
