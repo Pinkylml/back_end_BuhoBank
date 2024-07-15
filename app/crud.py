@@ -8,6 +8,7 @@ import resend
 from fastapi import FastAPI, HTTPException, Depends
 import os
 import random
+from datetime import datetime
 
 
 
@@ -25,8 +26,8 @@ async def add_customer(customer_data: CustomerModel) -> dict:
         # Verificar si la inserción fue exitosa
         if result.inserted_id:
             account_model = id_clinet(id=str(result.inserted_id))
-            await create_new_bank_account(account_model)
-            return True
+            new_account, response=await create_new_bank_account(account_model)
+            return True, new_account
         else:
             return False
     except Exception as e:
@@ -133,11 +134,19 @@ async def send_email(params: EmailParams) -> dict:
     
 async def number_account():
     account=random.randint(10000000, 99999999)
+    account=14000351
     query={
-        "numero_cuenta": account
+        "account_number": account
     }
-    account_data = await customer_collection.find_one(query)
-    if account_data is None:
+    account_data = await account_collection.find_one(query)
+    while(account_data is not None):
+        account=random.randint(10000000, 99999999)
+        query={
+            "account_number": account
+        }
+        account_data = await account_collection.find_one(query)
+    
+    if account_data is None:    
         return account
     
 
@@ -147,9 +156,7 @@ async def add_new_bank_account(num_account):
     new_account={
         "account_number":num_account,
         "balance":0.0,
-        "movements":{
-            
-        }
+        "movements":[]
     }
     
     result = await account_collection.insert_one(new_account)
@@ -163,6 +170,7 @@ async def add_new_bank_account(num_account):
 
 async def create_new_bank_account(id:id_clinet)-> dict:
     account=await number_account()
+    print("numero cuenta creada",account)
     user_data=await customer_collection.find_one({"_id": ObjectId(id.id)})
     current_accounts=user_data['accounts']
     current_accounts.append(account)
@@ -176,12 +184,118 @@ async def create_new_bank_account(id:id_clinet)-> dict:
         print("se modifico")
         new_account=await add_new_bank_account(account)
         if new_account:
-            return {"CODE":"NEW_ACCOUNT_CREATED"}
+            return account,{"CODE":"NEW_ACCOUNT_CREATED"}
         else:
-            return {"CODE":"NEW_ACCOUNT_DONT_CREATED"}
+            return account,{"CODE":"NEW_ACCOUNT_DONT_CREATED"}
         
     else:
         print("dea a malas")
+        
+#Code for make transfer:
+
+
+async def available_balance(num_account,ammount_to_transfer):
+    print("tipo de dato", type(num_account))
+    num_account=int(num_account)
+    query={
+        "account_number":num_account,
+    }
+    
+    result = await account_collection.find_one(query)
+    print("resultados\n",result)
+    if result is None:
+        print("no hay cuenta")
+    else:
+        print("si hay cuenta")
+        balance=result['balance']
+        if (balance>=ammount_to_transfer):
+            print("hay suficiente saldo")
+            return True, balance
+        else:
+            print("No hay suficiente saldo")
+            return False, 0.0
+        
+async def destination_account_verify(destination_acount):
+    num_account=int(destination_acount)
+    query={
+        "account_number":num_account,
+    }
+    
+    result = await account_collection.find_one(query)
+    if result is None:
+        return False,result
+    else:
+        return True, result
+    
+                
+
+async def update_transfer(data_transfer,balance):
+    is_destination_account,account_destinatio=await destination_account_verify(data_transfer['accountNumber'])
+    if is_destination_account:
+        new_balance_destination=account_destinatio['balance']+data_transfer['amount']
+        new_balance_source=balance-data_transfer['amount']
+        new_balance_destination=round(new_balance_destination,2)
+        new_balance_source=round(new_balance_source,2)
+        filter_source_account = {"account_number": int(data_transfer['selectedAccount'])}
+        filter_destination_acount={"account_number": int(data_transfer['accountNumber'])}
+        fecha_actual = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        new_movement_source = {
+            "fecha_movimiento": fecha_actual,
+            "saldo_entra": 0.0,
+            "saldo_sale": float(data_transfer['amount']),
+            "saldo_resultante": new_balance_source,
+            "cuenta_origen": int(data_transfer['selectedAccount']),
+            "cuenta_destino": int(data_transfer['accountNumber'])
+        }
+        new_movement_destination = {
+            "fecha_movimiento": fecha_actual,
+            "saldo_entra": float(data_transfer['amount']),
+            "saldo_sale": 0.0,
+            "saldo_resultante": new_balance_destination,
+            "cuenta_origen": int(data_transfer['selectedAccount']),
+            "cuenta_destino": int(data_transfer['accountNumber'])
+        }
+        update_source={
+            "$set":{"balance": new_balance_source}, 
+            "$push": {"movements": new_movement_source}
+        }
+        update_destination={
+            "$set":{"balance": new_balance_destination} ,
+            "$push": {"movements": new_movement_destination}
+        }
+        result1=await account_collection.update_one(filter_source_account, update_source)
+        result2=await account_collection.update_one(filter_destination_acount, update_destination)
+        if result1.modified_count>0 and result2.modified_count>0:
+            return 200, {"code":"TRANSFER_SUCCESSFUL"}
+        else:
+            return 500, {"code":"ERROR_IN_DATABASE"}
+    else:
+        return 404, {"code":"NOT_FOUND_ACCOUNT"}
+        
+      
+
+
+
+
+async def make_transfer(data_transer)->dict:
+    enought_balance, balance=await available_balance(data_transer['selectedAccount'],data_transer['amount'])
+    if enought_balance:
+        status,response=await update_transfer(data_transer,balance)
+        return status,response
+    else:
+        return 400,{"code":"NOT_BALANCE"}
+    
+    
+async def get_accounts(id)->dict:
+    used_data= await customer_collection.find_one({"_id": ObjectId(id)})
+    print(used_data)
+    acounts_data=await fetchAcounts(used_data['accounts'])
+    print("get",acounts_data)
+    return acounts_data
+
+        
+    
+    
     
 
     

@@ -1,8 +1,9 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from .models import CustomerModel, LogInModel,UpdatePass,EmailParams,id_clinet
+from .models import CustomerModel, LogInModel,UpdatePass,EmailParams,id_clinet,TransferData
 from .crud import add_customer,update_customer,checkData, update_password, send_email,create_new_bank_account
+from .crud import make_transfer
 from fastapi.encoders import jsonable_encoder
 from .verifyData import verifyDataCI, verifyDataEmail,verifyDataUser, verify_password_requirements
 import os
@@ -16,7 +17,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["POST"],
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
 )
 
@@ -47,9 +48,10 @@ async def create_customer(customer: CustomerModel):
             response = jsonable_encoder({"code": "EMAIL_REPEAT"})
             return JSONResponse(status_code=201, content=response)
         else:
-            new_customer = await add_customer(customer)
+            new_customer,new_account = await add_customer(customer)
             if new_customer:
-                response=jsonable_encoder({"code":"USER_CREATE"})
+                response=jsonable_encoder({"code":"USER_CREATE",
+                                           "account":new_account})
                 return JSONResponse(status_code=201, content=response)
         
                     
@@ -59,7 +61,6 @@ async def create_customer(customer: CustomerModel):
 async def logIn (Credentials: LogInModel):
     authenticate,bank_accounts,id = await checkData(Credentials)
     id=str(id)
-    print(id)
     if authenticate:
         if len(bank_accounts)>0:
             response_data = {
@@ -105,11 +106,33 @@ async def send_mail(params: EmailParams):
 
 @app.post("/create_bank_account")
 async def send_mail(id: id_clinet):
-    print(id)
-    print(type(id))
-    print(type(id.id))
-    responce=await create_new_bank_account(id)
-    print(id)
+    account,responce=await create_new_bank_account(id)
+    responce['account_number']=account
+    responce['balance']=0.0
     responce=jsonable_encoder(responce)
     return JSONResponse(status_code=200, content=responce)
+    
+    
+@app.post("/transfer")
+async def transfer(transfer_data:TransferData):
+    print(transfer_data)
+    print(type(transfer_data))
+    transfer_data_dict=transfer_data.dict(by_alias=True)
+    status,response=await make_transfer(transfer_data_dict)
+    if status==200:
+        return JSONResponse(status_code=status,content=response)
+    else:
+        return JSONResponse(status_code=status,content=response)
+    
+from .crud import get_accounts
+@app.get("/client_accounts/{client_id}")
+async def get_client_accounts(client_id: str):
+    used_data=await get_accounts(client_id)
+    response={
+        "accounts_list":used_data
+    }
+    print("response\n",response)
+    response=jsonable_encoder(response)
+    return response
+
     
