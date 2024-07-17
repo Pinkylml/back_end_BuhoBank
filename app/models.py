@@ -30,7 +30,7 @@ class UpdatePass(BaseModel):
     new_password:str
 
 class EmailParams(BaseModel):
-    to: EmailStr
+    email: EmailStr
     
 class id_clinet(BaseModel):
     id: str
