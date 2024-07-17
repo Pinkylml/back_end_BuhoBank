@@ -6,9 +6,6 @@ async def verifyDataCI(customer_data: CustomerModel) -> dict:
         "ci": customer_data.ci
     }
     user_data= await customer_collection.find_one(query)
-    print("en verugudataCI  \n",type(user_data))
-    print(user_data)
-    
     if user_data is None:
         return False,False
     else:

@@ -2,12 +2,16 @@ import smtplib
 from email.mime.text import MIMEText
 from email.utils import parseaddr
 import dns.resolver
+from ..database import customer_collection,account_collection
+from fastapi import FastAPI, HTTPException, Depends
+from datetime import datetime
+from ..models import CustomerModel
+from ..verifyData import verifyDataCI, verifyDataEmail,verifyDataUser, verify_password_requirements
+import random
+import os
 
 
 def send_email(subject, html_body, sender, recipients, password):
-
-        
-
     try:
         domain = parseaddr(recipients)[1].split('@')[-1]
         dns.resolver.resolve(domain, 'MX')
@@ -28,6 +32,48 @@ def send_email(subject, html_body, sender, recipients, password):
     except  Exception as e: #(dns.resolver.NoAnswer, dns.resolver.NXDOMAIN):
         print (f"DOMAIN ERROR {e}")
         return 400, {"code":"EMAIL_DONT_EXIST"}
+    
+def prepare_email(email):
+    code=random.randint(100000, 999999)
+    subject = "Código de verificación"
+    html_body=f"""
+        <html>
+            <body>
+                <p>Su código de verificación es:</p>
+                <p><strong>{code}</strong></p>
+            </body>
+        </html>
+        """
+    sender = "jeff.can1995@gmail.com"
+    recipients = [f"{email}"]
+    password =os.getenv('SMTP_APP_PASSWORD_GOOGLE')
+    status,response=send_email(subject, html_body, sender, recipients, password)
+    return status,response
+    
+async def preVerifyToSendEmail(customer: CustomerModel):
+    ci,credentials=await verifyDataCI(customer)
+    if ci:
+        if credentials:
+            response={"code":"CI_REPEAT"}
+            return 400,response 
+    else:        
+        if await verifyDataUser(customer):
+            response = {"code": "USER_REPEAT"}
+            return 400,response
+        else:
+            if (await verifyDataEmail(customer)):
+                response = {"code": "EMAIL_REPEAT"}
+                return 400,response
+            else:
+                status,response=prepare_email(customer.email)
+                return status,response
+
+
+
+
+    
+
+
     
   
     
