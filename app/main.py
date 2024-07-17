@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .models import CustomerModel, LogInModel,UpdatePass,EmailParams,id_clinet,TransferData
 from .crud import add_customer,update_customer,checkData, update_password,create_new_bank_account
 from .crud import make_transfer
+from .crud import get_accounts
 from fastapi.encoders import jsonable_encoder
 from .verifyData import verifyDataCI, verifyDataEmail,verifyDataUser, verify_password_requirements
 import os
@@ -150,7 +151,7 @@ async def transfer(transfer_data:TransferData):
     else:
         return JSONResponse(status_code=status,content=response)
     
-from .crud import get_accounts
+
 @app.get("/client_accounts/{client_id}")
 async def get_client_accounts(client_id: str):
     used_data=await get_accounts(client_id)
@@ -160,5 +161,8 @@ async def get_client_accounts(client_id: str):
     print("response\n",response)
     response=jsonable_encoder(response)
     return response
+
+
+
 
     

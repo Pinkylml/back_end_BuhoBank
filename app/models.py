@@ -43,3 +43,7 @@ class TransferData(BaseModel):
     accountNumber: str
     description: str = None
     notification: str = None
+
+
+class verifyCode(BaseModel):
+    code: str

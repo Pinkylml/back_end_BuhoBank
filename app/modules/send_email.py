@@ -55,15 +55,15 @@ async def preVerifyToSendEmail(customer: CustomerModel):
     if ci:
         if credentials:
             response={"code":"CI_REPEAT"}
-            return 400,response 
+            return 200,response 
     else:        
         if await verifyDataUser(customer):
             response = {"code": "USER_REPEAT"}
-            return 400,response
+            return 200,response
         else:
             if (await verifyDataEmail(customer)):
                 response = {"code": "EMAIL_REPEAT"}
-                return 400,response
+                return 200,response
             else:
                 status,response=prepare_email(customer.email)
                 return status,response
