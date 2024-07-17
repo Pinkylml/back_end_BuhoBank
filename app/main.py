@@ -8,6 +8,8 @@ from fastapi.encoders import jsonable_encoder
 from .verifyData import verifyDataCI, verifyDataEmail,verifyDataUser, verify_password_requirements
 import os
 import resend
+from .modules.send_email import send_email
+import random
 
 
 
@@ -101,10 +103,27 @@ async def change_password(new_data:UpdatePass):
     
 
 
-from .modules.send_email import send_email
+
 @app.post("/send_email")
 async def send_mail(params: EmailParams):
-    return await send_email(params)
+
+    code=random.randint(100000, 999999)
+    subject = "Código de verificación"
+    html_body=f"""
+        <html>
+            <body>
+                <p>Su código de verificación es:</p>
+                <p><strong>{code}</strong></p>
+            </body>
+        </html>
+        """
+    sender = "jeff.can1995@gmail.com"
+    recipients = [f"{params.email}"]
+    password =os.getenv('SMTP_APP_PASSWORD_GOOGLE')
+    status,response=send_email(subject, html_body, sender, recipients, password)
+    response=jsonable_encoder(response)
+    return JSONResponse(status_code=status,content=response)
+
 
 @app.post("/create_bank_account")
 async def send_mail(id: id_clinet):
