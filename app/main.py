@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from .models import CustomerModel, LogInModel,UpdatePass,EmailParams,id_clinet,TransferData
+from .models import CustomerModel, LogInModel,UpdatePass,EmailParams,id_clinet,TransferData,verifyCode
 from .crud import add_customer,update_customer,checkData, update_password,create_new_bank_account
 from .crud import make_transfer
 from .crud import get_accounts
@@ -150,6 +150,11 @@ async def transfer(transfer_data:TransferData):
         return JSONResponse(status_code=status,content=response)
     else:
         return JSONResponse(status_code=status,content=response)
+
+
+@app.post("/verify_code_email")
+async def verify_code_email(data:verifyCode):
+    print(data)
     
 
 @app.get("/client_accounts/{client_id}")
