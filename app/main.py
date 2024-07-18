@@ -10,6 +10,7 @@ from .verifyData import verifyDataCI, verifyDataEmail,verifyDataUser, verify_pas
 import os
 import resend
 from .modules.send_email import send_email,preVerifyToSendEmail
+from .modules.verifyCode import verifyCodeFunction
 import random
 
 
@@ -138,6 +139,9 @@ async def transfer(transfer_data:TransferData):
 @app.post("/verify_code_email")
 async def verify_code_email(data:verifyCode):
     print(data)
+    status, response=await verifyCodeFunction(data)
+    response=jsonable_encoder(response)
+    return JSONResponse(status_code=status,content=response)
     
 
 @app.get("/client_accounts/{client_id}")

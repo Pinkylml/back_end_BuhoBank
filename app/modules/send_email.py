@@ -39,7 +39,7 @@ async def save(code,email):
         "email": email,
         "code":code
     }
-    insert_result=code_verify_collection.insert_one(query)
+    insert_result=await code_verify_collection.insert_one(query)
     if insert_result.inserted_id:
         return True
     else:
@@ -59,12 +59,12 @@ async def prepare_email(email):
     sender = "buhobanco@gmail.com"
     recipients = [f"{email}"]
     password =os.getenv('SMTP_APP_PASSWORD_GOOGLE')
-    #save_flag=await save(code,email)
-    #if save_flag:
-    status,response=send_email(subject, html_body, sender, recipients, password)
-    #else:
-      #  status=200
-       # response={"code":"DONT_SAVE_CODE"}
+    save_flag=await save(code,email)
+    if save_flag:
+        status,response=send_email(subject, html_body, sender, recipients, password)
+    else:
+        status=200
+        response={"code":"DONT_SAVE_CODE"}
 
     return status,response
     
