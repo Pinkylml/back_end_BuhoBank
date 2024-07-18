@@ -37,7 +37,8 @@ def send_email(subject, html_body, sender, recipients, password):
 async def save(code,email):
     query = {
         "email": email,
-        "code":code
+        "code":code,
+        "attempts":3
     }
     insert_result=await code_verify_collection.insert_one(query)
     if insert_result.inserted_id:
