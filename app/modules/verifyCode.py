@@ -16,7 +16,8 @@ async def getData(email):
 
 async def deleteData(email):
     query={
-        "email":email        
+        "email":email 
+           
     }
     
     result_data=await code_verify_collection.delete_one(query)
@@ -24,6 +25,15 @@ async def deleteData(email):
         return True
     else:
         return False
+    
+async def updateAttempts(email,attemps):
+    await code_verify_collection.update_one(
+        {"email":email },
+        {"$set": {"attempts": attemps}}
+        
+    )
+
+    
 
 async def verifyCodeFunction (data:verifyCode)->dict:
     data_flag=await getData(data.email)
@@ -39,4 +49,11 @@ async def verifyCodeFunction (data:verifyCode)->dict:
             else:
                 return 200, {"code":"DELETE_NO_SUCCESS"}
         else:
+            #attemps=data_flag['attempts']
+            attempts = data_flag['attempts']
+            attempts=attempts-1
+            if attempts==0:
+                delete_flag=await deleteData(data.email)
+            else:
+                await updateAttempts(data.email,attempts)
             return 200, {"code":"NO_SUCCESS"}
