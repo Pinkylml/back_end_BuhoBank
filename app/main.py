@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from .models import CustomerModel, LogInModel,UpdatePass,EmailParams,id_clinet,TransferData
+from .models import CustomerModel, LogInModel,UpdatePass,EmailParams,id_clinet,TransferData,verifyCode
 from .crud import add_customer,update_customer,checkData, update_password,create_new_bank_account
 from .crud import make_transfer
 from .crud import get_accounts
@@ -112,23 +112,6 @@ async def send_mail(customer:CustomerModel):
     response = jsonable_encoder(response)
     return JSONResponse(status_code=status, content=response)
    
-    # print(params)
-    # code=random.randint(100000, 999999)
-    # subject = "Código de verificación"
-    # html_body=f"""
-    #     <html>
-    #         <body>
-    #             <p>Su código de verificación es:</p>
-    #             <p><strong>{code}</strong></p>
-    #         </body>
-    #     </html>
-    #     """
-    # sender = "jeff.can1995@gmail.com"
-    # recipients = [f"{params.email}"]
-    # password =os.getenv('SMTP_APP_PASSWORD_GOOGLE')
-    # status,response=send_email(subject, html_body, sender, recipients, password)
-    # response=jsonable_encoder(response)
-    # return JSONResponse(status_code=status,content=response)
 
 
 @app.post("/create_bank_account")
@@ -150,6 +133,11 @@ async def transfer(transfer_data:TransferData):
         return JSONResponse(status_code=status,content=response)
     else:
         return JSONResponse(status_code=status,content=response)
+
+
+@app.post("/verify_code_email")
+async def verify_code_email(data:verifyCode):
+    print(data)
     
 
 @app.get("/client_accounts/{client_id}")

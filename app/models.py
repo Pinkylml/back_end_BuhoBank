@@ -46,4 +46,5 @@ class TransferData(BaseModel):
 
 
 class verifyCode(BaseModel):
-    code: str
+    codigo: str
+    email: EmailStr
