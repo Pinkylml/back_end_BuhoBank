@@ -112,23 +112,6 @@ async def send_mail(customer:CustomerModel):
     response = jsonable_encoder(response)
     return JSONResponse(status_code=status, content=response)
    
-    # print(params)
-    # code=random.randint(100000, 999999)
-    # subject = "Código de verificación"
-    # html_body=f"""
-    #     <html>
-    #         <body>
-    #             <p>Su código de verificación es:</p>
-    #             <p><strong>{code}</strong></p>
-    #         </body>
-    #     </html>
-    #     """
-    # sender = "jeff.can1995@gmail.com"
-    # recipients = [f"{params.email}"]
-    # password =os.getenv('SMTP_APP_PASSWORD_GOOGLE')
-    # status,response=send_email(subject, html_body, sender, recipients, password)
-    # response=jsonable_encoder(response)
-    # return JSONResponse(status_code=status,content=response)
 
 
 @app.post("/create_bank_account")

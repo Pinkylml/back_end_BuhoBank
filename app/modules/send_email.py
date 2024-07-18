@@ -2,11 +2,11 @@ import smtplib
 from email.mime.text import MIMEText
 from email.utils import parseaddr
 import dns.resolver
-from ..database import customer_collection,account_collection
+from ..database import customer_collection,account_collection,code_verify_collection
 from fastapi import FastAPI, HTTPException, Depends
 from datetime import datetime
 from ..models import CustomerModel
-from ..verifyData import verifyDataCI, verifyDataEmail,verifyDataUser, verify_password_requirements
+from ..verifyData import verifyDataCI, verifyDataEmail,verifyDataUser
 import random
 import os
 
@@ -33,7 +33,19 @@ def send_email(subject, html_body, sender, recipients, password):
         print (f"DOMAIN ERROR {e}")
         return 400, {"code":"EMAIL_DONT_EXIST"}
     
-def prepare_email(email):
+
+async def save(code,email):
+    query = {
+        "email": email,
+        "code":code
+    }
+    insert_result=code_verify_collection.insert_one(query)
+    if insert_result.inserted_id:
+        return True
+    else:
+        return False
+    
+async def prepare_email(email):
     code=random.randint(100000, 999999)
     subject = "Código de verificación"
     html_body=f"""
@@ -44,10 +56,16 @@ def prepare_email(email):
             </body>
         </html>
         """
-    sender = "jeff.can1995@gmail.com"
+    sender = "buhobanco@gmail.com"
     recipients = [f"{email}"]
     password =os.getenv('SMTP_APP_PASSWORD_GOOGLE')
+    #save_flag=await save(code,email)
+    #if save_flag:
     status,response=send_email(subject, html_body, sender, recipients, password)
+    #else:
+      #  status=200
+       # response={"code":"DONT_SAVE_CODE"}
+
     return status,response
     
 async def preVerifyToSendEmail(customer: CustomerModel):
@@ -65,7 +83,7 @@ async def preVerifyToSendEmail(customer: CustomerModel):
                 response = {"code": "EMAIL_REPEAT"}
                 return 200,response
             else:
-                status,response=prepare_email(customer.email)
+                status,response=await prepare_email(customer.email)
                 return status,response
 
 
