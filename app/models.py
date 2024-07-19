@@ -21,5 +21,30 @@ class CustomerModel(BaseModel):
     #accounts: Optional[List[str]] = []
 
 class LogInModel(BaseModel):
-    email: EmailStr
+    user: str
     password: str
+    
+class UpdatePass(BaseModel):
+    user_id:str
+    current_password:str
+    new_password:str
+
+class EmailParams(BaseModel):
+    email: EmailStr
+    
+class id_clinet(BaseModel):
+    id: str
+    
+
+class TransferData(BaseModel):
+    selectedAccount: str
+    amount: float
+    beneficiary: str
+    accountNumber: str
+    description: str = None
+    notification: str = None
+
+
+class verifyCode(BaseModel):
+    codigo: str
+    email: EmailStr
