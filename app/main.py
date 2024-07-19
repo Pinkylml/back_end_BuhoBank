@@ -12,6 +12,7 @@ import resend
 from .modules.send_email import send_email,preVerifyToSendEmail, prepare_email
 from .modules.verifyCode import verifyCodeFunction
 import random
+from .database import setup_database
 
 
 
@@ -25,6 +26,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.on_event("startup")
+async def on_startup():
+    await setup_database()
 
 @app.post("/register_user", response_description="Add new customer", response_model=CustomerModel)
 async def create_customer(customer: CustomerModel):
