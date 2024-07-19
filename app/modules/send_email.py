@@ -9,6 +9,8 @@ from ..models import CustomerModel
 from ..verifyData import verifyDataCI, verifyDataEmail,verifyDataUser
 import random
 import os
+import datetime
+
 
 
 def send_email(subject, html_body, sender, recipients, password):
@@ -34,12 +36,20 @@ def send_email(subject, html_body, sender, recipients, password):
         return 200, {"code":"DOMAIN_DONT_EXIST"}
     
 
-async def save(code,email,collection):
-    query = {
-        "email": email,
-        "code":code,
-        "attempts":3
-    }
+async def save(code,email,collection, parametro):
+    if parametro == 0:
+        query = {
+            "email": email,
+            "code":code,
+            "attempts":3
+        }
+    elif parametro == 1:
+        query = {
+            "email": email,
+            "code":code,
+            "time":datetime.datetime.utcnow(),
+            "expiresAt": datetime.datetime.utcnow() + datetime.timedelta(minutes=1)  # Hora de expiración
+        }
     insert_result=await collection.insert_one(query)
     if insert_result.inserted_id:
         return True
@@ -53,7 +63,7 @@ async def prepare_email(email, parametro):
     code=random.randint(100000, 999999)
     save_flag = ""
     if parametro == 0:
-        save_flag=await save(code,email, code_verify_collection)
+        save_flag=await save(code,email, code_verify_collection, parametro)
         subject = "Código de verificación"
         html_body=f"""
             <html>
@@ -76,7 +86,7 @@ async def prepare_email(email, parametro):
     elif parametro==1:
         check = await CheckIsRegistered(code, email)
         if check:
-            saveResult = await save(code, email, reset_verify_colletion)
+            saveResult = await save(code, email, reset_verify_colletion, parametro)
             if saveResult:
                 subject = "Código de verificación"
                 html_body=f"""
