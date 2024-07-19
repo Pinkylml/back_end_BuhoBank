@@ -28,10 +28,10 @@ def send_email(subject, html_body, sender, recipients, password):
             return 200, {"code":"EMAIL_SEND"}
         except Exception as e:
             print(f"Error in sent email {e}")
-            return 500, {"code":"EMAIL_DONT_SEND"}
+            return 200, {"code":"EMAIL_DONT_SEND"}
     except  Exception as e: #(dns.resolver.NoAnswer, dns.resolver.NXDOMAIN):
         print (f"DOMAIN ERROR {e}")
-        return 400, {"code":"EMAIL_DONT_EXIST"}
+        return 200, {"code":"DOMAIN_DONT_EXIST"}
     
 
 async def save(code,email,collection):
