@@ -9,7 +9,7 @@ from fastapi.encoders import jsonable_encoder
 from .verifyData import verifyDataCI, verifyDataEmail,verifyDataUser, verify_password_requirements
 import os
 import resend
-from .modules.send_email import send_email,preVerifyToSendEmail
+from .modules.send_email import send_email,preVerifyToSendEmail, prepare_email
 from .modules.verifyCode import verifyCodeFunction
 import random
 
@@ -155,6 +155,8 @@ async def get_client_accounts(client_id: str):
     return response
 
 
-
-
-    
+@app.post("/recover_password")
+async def recover_password(request: EmailParams):
+    status, response = await prepare_email(request.email, 1)
+    responseJ = jsonable_encoder(response)
+    return JSONResponse(status_code=status, content=responseJ)
