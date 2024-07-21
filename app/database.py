@@ -27,6 +27,7 @@ async def create_ttl_index():
     try:
         index = IndexModel([("expiresAt", ASCENDING)], expireAfterSeconds=0)
         await reset_verify_colletion.create_indexes([index])
+        await code_verify_collection.create_indexes([index])
         print("TTL Index created successfully")
     except Exception as e:
         print(f"Failed to create TTL index: {e}")
