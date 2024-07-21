@@ -106,7 +106,7 @@ async def prepare_email(email, parametro):
                 recipients = [f"{email}"]
                 password =os.getenv('SMTP_APP_PASSWORD_GOOGLE')
                 status,response=send_email(subject, html_body, sender, recipients, password)
-                response['user']=user_name
+                response['id']=user_name
                 return status, response
             else:
                 status=200
@@ -140,10 +140,10 @@ async def CheckIsRegistered(code, email):
     result = await customer_collection.find_one({"email": email})
     print(result, "CheckIsRegistered")
     if result:
-        return True, result['user']
+        return True, str(result['_id'])
     else:
         print("No hay cuenta para agregar cod.")
-        return False
+        return False,None
 
 
 
