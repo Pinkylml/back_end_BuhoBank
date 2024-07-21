@@ -48,3 +48,4 @@ class TransferData(BaseModel):
 class verifyCode(BaseModel):
     codigo: str
     email: EmailStr
+    parameter:int

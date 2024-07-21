@@ -143,7 +143,7 @@ async def transfer(transfer_data:TransferData):
 @app.post("/verify_code_email")
 async def verify_code_email(data:verifyCode):
     print(data)
-    status, response=await verifyCodeFunction(data)
+    status, response=await verifyCodeFunction(data,data.parameter)
     response=jsonable_encoder(response)
     return JSONResponse(status_code=status,content=response)
     

@@ -41,12 +41,15 @@ async def save(code,email,collection, parametro):
         query = {
             "email": email,
             "code":code,
-            "attempts":3
+            "attempts":3,
+             "time":datetime.datetime.utcnow(),
+            "expiresAt": datetime.datetime.utcnow() + datetime.timedelta(minutes=1) 
         }
     elif parametro == 1:
         query = {
             "email": email,
             "code":code,
+            "attempts":3,
             "time":datetime.datetime.utcnow(),
             "expiresAt": datetime.datetime.utcnow() + datetime.timedelta(minutes=1)  # Hora de expiración
         }
@@ -84,7 +87,8 @@ async def prepare_email(email, parametro):
             response={"code":"DONT_SAVE_CODE"}
             return status,response
     elif parametro==1:
-        check = await CheckIsRegistered(code, email)
+        check,user_name = await CheckIsRegistered(code, email)
+        ###Aui hacer el update
         if check:
             saveResult = await save(code, email, reset_verify_colletion, parametro)
             if saveResult:
@@ -102,6 +106,7 @@ async def prepare_email(email, parametro):
                 recipients = [f"{email}"]
                 password =os.getenv('SMTP_APP_PASSWORD_GOOGLE')
                 status,response=send_email(subject, html_body, sender, recipients, password)
+                response['user']=user_name
                 return status, response
             else:
                 status=200
@@ -135,7 +140,7 @@ async def CheckIsRegistered(code, email):
     result = await customer_collection.find_one({"email": email})
     print(result, "CheckIsRegistered")
     if result:
-        return True
+        return True, result['user']
     else:
         print("No hay cuenta para agregar cod.")
         return False
