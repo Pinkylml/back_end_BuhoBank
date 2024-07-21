@@ -53,11 +53,27 @@ async def save(code,email,collection, parametro):
             "time":datetime.datetime.utcnow(),
             "expiresAt": datetime.datetime.utcnow() + datetime.timedelta(minutes=1)  # Hora de expiración
         }
-    insert_result=await collection.insert_one(query)
-    if insert_result.inserted_id:
-        return True
-    else:
-        return False
+    check,user = await CheckIsRegistered(code, email, collection)
+    if not check:
+        insert_result=await collection.insert_one(query)
+        if insert_result.inserted_id:
+            return True
+        else:
+            return False
+    else: 
+        update_result= await collection.update_one(
+            {"email": email},
+            {"$set":{
+                "code":code,
+            "attempts":3,
+            "time":datetime.datetime.utcnow(),
+            "expiresAt": datetime.datetime.utcnow() + datetime.timedelta(minutes=1)  # Hora de expiración
+            }}
+        )
+        if update_result.modified_count > 0:
+            return True
+        else: 
+            return False 
 
 
 async def prepare_email(email, parametro):
@@ -87,8 +103,7 @@ async def prepare_email(email, parametro):
             response={"code":"DONT_SAVE_CODE"}
             return status,response
     elif parametro==1:
-        check,user_name = await CheckIsRegistered(code, email)
-        ###Aui hacer el update
+        check,user_name = await CheckIsRegistered(code, email, customer_collection)
         if check:
             saveResult = await save(code, email, reset_verify_colletion, parametro)
             if saveResult:
@@ -136,14 +151,15 @@ async def preVerifyToSendEmail(customer: CustomerModel):
                 status,response=await prepare_email(customer.email, 0)
                 return status,response
 
-async def CheckIsRegistered(code, email):
-    result = await customer_collection.find_one({"email": email})
+async def CheckIsRegistered(code, email, collection):
+    result = await collection.find_one({"email": email})
     print(result, "CheckIsRegistered")
     if result:
-        return True, result['user']
+        user = result.get('user', 'Campo no encontrado')  # O 'None' si prefieres un valor nulo
+        return True, user
     else:
         print("No hay cuenta para agregar cod.")
-        return False
+        return False, None
 
 
 
