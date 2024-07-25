@@ -5,6 +5,7 @@ from .models import CustomerModel, LogInModel,UpdatePass,EmailParams,id_clinet,T
 from .crud import add_customer,update_customer,checkData, update_password,create_new_bank_account
 from .crud import make_transfer
 from .crud import get_accounts
+from .crud import consultBankAccount
 from fastapi.encoders import jsonable_encoder
 from .verifyData import verifyDataCI, verifyDataEmail,verifyDataUser, verify_password_requirements
 import os
@@ -157,6 +158,14 @@ async def get_client_accounts(client_id: str):
     print("response\n",response)
     response=jsonable_encoder(response)
     return response
+
+
+@app.get("/search_bank_account/{bank_account}")
+async def get_client_accounts(bank_account:int):
+    status, response=await consultBankAccount(bank_account)
+    response=jsonable_encoder(response)
+    return response
+    
 
 
 @app.post("/recover_password")

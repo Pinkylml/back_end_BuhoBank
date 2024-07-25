@@ -31,6 +31,9 @@ async def create_ttl_index():
         print("TTL Index created successfully")
     except Exception as e:
         print(f"Failed to create TTL index: {e}")
+        
+        
+        
 
 async def setup_database():
     await create_ttl_index()
