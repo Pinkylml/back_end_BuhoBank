@@ -28,6 +28,7 @@ class UpdatePass(BaseModel):
     user_id:str
     current_password:str
     new_password:str
+    parameter: int
 
 class EmailParams(BaseModel):
     email: EmailStr
@@ -48,3 +49,4 @@ class TransferData(BaseModel):
 class verifyCode(BaseModel):
     codigo: str
     email: EmailStr
+    parameter:int

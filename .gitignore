@@ -11,3 +11,8 @@ app/__pycache__/
 __pycache__/
 /__pycache__/
 gut
+.vercel
+
+#vercel
+vercel.json
+.vercel

@@ -5,6 +5,7 @@ from .models import CustomerModel, LogInModel,UpdatePass,EmailParams,id_clinet,T
 from .crud import add_customer,update_customer,checkData, update_password,create_new_bank_account
 from .crud import make_transfer
 from .crud import get_accounts
+from .crud import consultBankAccount
 from fastapi.encoders import jsonable_encoder
 from .verifyData import verifyDataCI, verifyDataEmail,verifyDataUser, verify_password_requirements
 import os
@@ -12,6 +13,7 @@ import resend
 from .modules.send_email import send_email,preVerifyToSendEmail, prepare_email
 from .modules.verifyCode import verifyCodeFunction
 import random
+from .database import setup_database
 
 
 
@@ -25,6 +27,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.on_event("startup")
+async def on_startup():
+    await setup_database()
 
 @app.post("/register_user", response_description="Add new customer", response_model=CustomerModel)
 async def create_customer(customer: CustomerModel):
@@ -139,7 +144,7 @@ async def transfer(transfer_data:TransferData):
 @app.post("/verify_code_email")
 async def verify_code_email(data:verifyCode):
     print(data)
-    status, response=await verifyCodeFunction(data)
+    status, response=await verifyCodeFunction(data,data.parameter)
     response=jsonable_encoder(response)
     return JSONResponse(status_code=status,content=response)
     
@@ -153,6 +158,14 @@ async def get_client_accounts(client_id: str):
     print("response\n",response)
     response=jsonable_encoder(response)
     return response
+
+
+@app.get("/search_bank_account/{bank_account}")
+async def get_client_accounts(bank_account:int):
+    status, response=await consultBankAccount(bank_account)
+    response=jsonable_encoder(response)
+    return response
+    
 
 
 @app.post("/recover_password")
