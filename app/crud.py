@@ -270,9 +270,9 @@ async def update_transfer(data_transfer,balance):
         if result1.modified_count>0 and result2.modified_count>0:
             return 200, {"code":"TRANSFER_SUCCESSFUL"}
         else:
-            return 500, {"code":"ERROR_IN_DATABASE"}
+            return 200, {"code":"ERROR_IN_DATABASE"}
     else:
-        return 404, {"code":"NOT_FOUND_ACCOUNT"}
+        return 200, {"code":"NOT_FOUND_ACCOUNT"}
         
       
 
@@ -285,15 +285,35 @@ async def make_transfer(data_transer)->dict:
         status,response=await update_transfer(data_transer,balance)
         return status,response
     else:
-        return 400,{"code":"NOT_BALANCE"}
+        return 200,{"code":"NOT_BALANCE"}
     
     
 async def get_accounts(id)->dict:
     used_data= await customer_collection.find_one({"_id": ObjectId(id)})
-    print(used_data)
     acounts_data=await fetchAcounts(used_data['accounts'])
     print("get",acounts_data)
     return acounts_data
+
+
+
+async def consultBankAccount(bankAccount)->dict:
+    user_data=await customer_collection.find_one({'accounts': bankAccount})
+    if user_data:
+        name=user_data['name']+" "+user_data["lastname"]
+        status=200
+        response={
+            "code":"TRUE_ACCOUNT",
+            "name":name
+        }
+        return status, response
+    else:
+        response={
+            "code":"FALSE_ACCOUNT"
+        }
+        return 200, response
+    
+    
+    
 
         
     
