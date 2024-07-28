@@ -243,6 +243,7 @@ async def update_transfer(data_transfer,balance):
             "fecha_movimiento": fecha_actual,
             "saldo_entra": 0.0,
             "saldo_sale": float(data_transfer['amount']),
+            "saldo_anterior":float(balance),
             "saldo_resultante": new_balance_source,
             "cuenta_origen": int(data_transfer['selectedAccount']),
             "cuenta_destino": int(data_transfer['accountNumber'])
@@ -251,6 +252,7 @@ async def update_transfer(data_transfer,balance):
             "fecha_movimiento": fecha_actual,
             "saldo_entra": float(data_transfer['amount']),
             "saldo_sale": 0.0,
+            "saldo_anterior":float(account_destinatio['balance']),
             "saldo_resultante": new_balance_destination,
             "cuenta_origen": int(data_transfer['selectedAccount']),
             "cuenta_destino": int(data_transfer['accountNumber'])
