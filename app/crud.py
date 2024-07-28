@@ -197,14 +197,12 @@ async def create_new_bank_account(id:id_clinet)-> dict:
 
 
 async def available_balance(num_account,ammount_to_transfer):
-    print("tipo de dato", type(num_account))
     num_account=int(num_account)
     query={
         "account_number":num_account,
     }
     
     result = await account_collection.find_one(query)
-    print("resultados\n",result)
     if result is None:
         print("no hay cuenta")
     else:

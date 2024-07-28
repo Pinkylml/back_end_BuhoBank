@@ -14,6 +14,7 @@ from .modules.send_email import send_email,preVerifyToSendEmail, prepare_email
 from .modules.verifyCode import verifyCodeFunction
 import random
 from .database import setup_database
+from .modules.sendCodeTransfer import prepareEmailTransfer
 
 
 
@@ -71,6 +72,7 @@ async def logIn (Credentials: LogInModel):
     authenticate,bank_accounts,user = await checkData(Credentials)
     id=str(user["_id"])
     name_user=user["name"]+" "+user['lastname']
+    user_email=user['email']
     if authenticate:
         if len(bank_accounts)>0:
             response_data = {
@@ -78,7 +80,8 @@ async def logIn (Credentials: LogInModel):
                 "code":"HAVE_ACCOUNTS",
                 "id":id,
                 "accounts_list":bank_accounts,
-                "name_user":name_user
+                "name_user":name_user,
+                "user_email":user_email
             }
           
         else:
@@ -119,6 +122,19 @@ async def send_mail(customer:CustomerModel):
     status,response=await preVerifyToSendEmail(customer)
     response = jsonable_encoder(response)
     return JSONResponse(status_code=status, content=response)
+
+
+
+@app.post("/send_email_to_transfer")
+async def send_mail(customer_id:EmailParams):
+    email=customer_id.email
+    print(email)
+    print("typoe of",type(email))
+    status,response=await prepareEmailTransfer(email)
+    response = jsonable_encoder(response)
+    return JSONResponse(status_code=status, content=response)
+    
+    
    
 
 
@@ -133,8 +149,6 @@ async def send_mail(id: id_clinet):
     
 @app.post("/transfer")
 async def transfer(transfer_data:TransferData):
-    print(transfer_data)
-    print(type(transfer_data))
     transfer_data_dict=transfer_data.dict(by_alias=True)
     status,response=await make_transfer(transfer_data_dict)
     if status==200:
@@ -157,7 +171,6 @@ async def get_client_accounts(client_id: str):
     response={
         "accounts_list":used_data
     }
-    print("response\n",response)
     response=jsonable_encoder(response)
     return response
 
