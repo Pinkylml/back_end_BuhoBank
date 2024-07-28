@@ -89,7 +89,7 @@ async def checkData(credentials: LogInModel) -> bool:
     accounts_data_response=await fetchAcounts(user['accounts'])
     print(accounts_data_response)
     if bcrypt.checkpw(credentials.password.encode('utf-8'), hashed_password.encode('utf-8')):
-        return True,accounts_data_response,user['_id']
+        return True,accounts_data_response,user
     else:
         return False
     

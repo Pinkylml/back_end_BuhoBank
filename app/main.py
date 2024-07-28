@@ -68,15 +68,17 @@ async def create_customer(customer: CustomerModel):
 
 @app.post("/login", response_model=dict)
 async def logIn (Credentials: LogInModel):
-    authenticate,bank_accounts,id = await checkData(Credentials)
-    id=str(id)
+    authenticate,bank_accounts,user = await checkData(Credentials)
+    id=str(user["_id"])
+    name_user=user["name"]+" "+user['lastname']
     if authenticate:
         if len(bank_accounts)>0:
             response_data = {
                 "authenticated": authenticate,
                 "code":"HAVE_ACCOUNTS",
                 "id":id,
-                "accounts_list":bank_accounts
+                "accounts_list":bank_accounts,
+                "name_user":name_user
             }
           
         else:

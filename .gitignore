@@ -16,3 +16,7 @@ gut
 #vercel
 vercel.json
 .vercel
+
+
+#DockerFIle
+Dockerfile
