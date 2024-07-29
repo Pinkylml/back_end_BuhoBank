@@ -1,4 +1,4 @@
-from ..database import code_verify_collection,reset_verify_colletion
+from ..database import code_verify_collection,reset_verify_colletion,code_transfer_collection
 from ..models import verifyCode
 
 
@@ -40,7 +40,6 @@ async def verifyCodeFunction (data:verifyCode,parametro)->dict:
     # parametro 1 para reseteo
     if parametro==0:
         data_flag=await getData(data.email,code_verify_collection)
-        print("En verificar el codigo",data_flag)
         if data_flag:
             save_code=data_flag['code']
             get_code=data.codigo
@@ -64,7 +63,7 @@ async def verifyCodeFunction (data:verifyCode,parametro)->dict:
             return 200, {"code":"TIME_OUT"}
     elif parametro==1:
         data_flag=await getData(data.email,reset_verify_colletion)
-        print("En verificar el codigo",data_flag)
+        
         if data_flag:
             save_code=data_flag['code']
             get_code=data.codigo
@@ -83,6 +82,30 @@ async def verifyCodeFunction (data:verifyCode,parametro)->dict:
                     delete_flag=await deleteData(data.email,reset_verify_colletion)
                 else:
                     await updateAttempts(data.email,attempts,reset_verify_colletion)
+                return 200, {"code":"NO_SUCCESS"}
+        else:
+            return 200, {"code":"TIME_OUT"}
+    elif parametro==2:
+        data_flag=await getData(data.email,code_transfer_collection)
+        
+        if data_flag:
+            save_code=data_flag['code']
+            get_code=data.codigo
+            get_code=int(get_code)
+            if save_code==get_code:
+                delete_flag=await deleteData(data.email,code_transfer_collection)
+                if delete_flag:
+                    return 200, {"code":"SUCCESS"}
+                else:
+                    return 200, {"code":"DELETE_NO_SUCCESS"}
+            else:
+                #attemps=data_flag['attempts']
+                attempts = data_flag['attempts']
+                attempts=attempts-1
+                if attempts==0:
+                    delete_flag=await deleteData(data.email,code_transfer_collection)
+                else:
+                    await updateAttempts(data.email,attempts,code_transfer_collection)
                 return 200, {"code":"NO_SUCCESS"}
         else:
             return 200, {"code":"TIME_OUT"}

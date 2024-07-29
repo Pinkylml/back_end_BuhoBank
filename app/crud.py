@@ -89,7 +89,7 @@ async def checkData(credentials: LogInModel) -> bool:
     accounts_data_response=await fetchAcounts(user['accounts'])
     print(accounts_data_response)
     if bcrypt.checkpw(credentials.password.encode('utf-8'), hashed_password.encode('utf-8')):
-        return True,accounts_data_response,user['_id']
+        return True,accounts_data_response,user
     else:
         return False
     
@@ -197,14 +197,12 @@ async def create_new_bank_account(id:id_clinet)-> dict:
 
 
 async def available_balance(num_account,ammount_to_transfer):
-    print("tipo de dato", type(num_account))
     num_account=int(num_account)
     query={
         "account_number":num_account,
     }
     
     result = await account_collection.find_one(query)
-    print("resultados\n",result)
     if result is None:
         print("no hay cuenta")
     else:
@@ -245,6 +243,7 @@ async def update_transfer(data_transfer,balance):
             "fecha_movimiento": fecha_actual,
             "saldo_entra": 0.0,
             "saldo_sale": float(data_transfer['amount']),
+            "saldo_anterior":float(balance),
             "saldo_resultante": new_balance_source,
             "cuenta_origen": int(data_transfer['selectedAccount']),
             "cuenta_destino": int(data_transfer['accountNumber'])
@@ -253,6 +252,7 @@ async def update_transfer(data_transfer,balance):
             "fecha_movimiento": fecha_actual,
             "saldo_entra": float(data_transfer['amount']),
             "saldo_sale": 0.0,
+            "saldo_anterior":float(account_destinatio['balance']),
             "saldo_resultante": new_balance_destination,
             "cuenta_origen": int(data_transfer['selectedAccount']),
             "cuenta_destino": int(data_transfer['accountNumber'])
