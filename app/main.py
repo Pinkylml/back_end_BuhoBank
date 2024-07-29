@@ -73,6 +73,7 @@ async def logIn (Credentials: LogInModel):
     id=str(user["_id"])
     name_user=user["name"]+" "+user['lastname']
     user_email=user['email']
+    user_n= user['user']
     if authenticate:
         if len(bank_accounts)>0:
             response_data = {
@@ -81,7 +82,8 @@ async def logIn (Credentials: LogInModel):
                 "id":id,
                 "accounts_list":bank_accounts,
                 "name_user":name_user,
-                "user_email":user_email
+                "user_email":user_email,
+                "user": user_n
             }
           
         else:
