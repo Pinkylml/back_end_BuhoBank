@@ -43,7 +43,7 @@ async def save(code,email,collection, parametro):
             "code":code,
             "attempts":3,
              "time":datetime.datetime.utcnow(),
-            "expiresAt": datetime.datetime.utcnow() + datetime.timedelta(minutes=1) 
+            "expiresAt": datetime.datetime.utcnow() + datetime.timedelta(minutes=5) 
         }
     elif parametro == 1:
         query = {
@@ -51,7 +51,7 @@ async def save(code,email,collection, parametro):
             "code":code,
             "attempts":3,
             "time":datetime.datetime.utcnow(),
-            "expiresAt": datetime.datetime.utcnow() + datetime.timedelta(minutes=1)  # Hora de expiración
+            "expiresAt": datetime.datetime.utcnow() + datetime.timedelta(minutes=5)  # Hora de expiración
         }
     check,user = await CheckIsRegistered(code, email, collection)
     if not check:
@@ -67,7 +67,7 @@ async def save(code,email,collection, parametro):
                 "code":code,
             "attempts":3,
             "time":datetime.datetime.utcnow(),
-            "expiresAt": datetime.datetime.utcnow() + datetime.timedelta(minutes=1)  # Hora de expiración
+            "expiresAt": datetime.datetime.utcnow() + datetime.timedelta(minutes=5)  # Hora de expiración
             }}
         )
         if update_result.modified_count > 0:
