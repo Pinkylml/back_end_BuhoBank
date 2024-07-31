@@ -311,13 +311,3 @@ async def consultBankAccount(bankAccount)->dict:
             "code":"FALSE_ACCOUNT"
         }
         return 200, response
-    
-    
-    
-
-        
-    
-    
-    
-
-    
