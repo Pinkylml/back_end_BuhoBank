@@ -50,3 +50,8 @@ class verifyCode(BaseModel):
     codigo: str
     email: EmailStr
     parameter:int
+
+class payBillModel(BaseModel):
+    contract: int #Nro de cuenta a la que se lanza la planilla
+    parameter:int #Parametro seleccionada para definir el servicio
+    account: int #Cuenta bancaria seleccionada para pagar la factura
