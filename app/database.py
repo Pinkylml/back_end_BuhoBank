@@ -3,8 +3,7 @@ from pymongo.errors import ConnectionFailure
 from pymongo import IndexModel, ASCENDING
 
 
-#MONGO_DETAILS = "mongodb+srv://buhobanco:cB5W7tVdZxuUQYWN@buhobanco.tpw58ga.mongodb.net/?retryWrites=true&w=majority&appName=BuhoBanco"
-MONGO_DETAILS = "mongodb://localhost:27017"
+MONGO_DETAILS = "mongodb+srv://buhobanco:cB5W7tVdZxuUQYWN@buhobanco.tpw58ga.mongodb.net/?retryWrites=true&w=majority&appName=BuhoBanco"
 
 client = AsyncIOMotorClient(MONGO_DETAILS)
 
