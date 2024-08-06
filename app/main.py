@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from .models import CustomerModel, LogInModel,UpdatePass,EmailParams,id_clinet,TransferData,verifyCode
+from .models import CustomerModel, LogInModel,UpdatePass,EmailParams,id_clinet,TransferData,verifyCode, payBillModel
 from .crud import add_customer,update_customer,checkData, update_password,create_new_bank_account
 from .crud import make_transfer
 from .crud import get_accounts
@@ -15,7 +15,7 @@ from .modules.verifyCode import verifyCodeFunction
 import random
 from .database import setup_database
 from .modules.sendCodeTransfer import prepareEmailTransfer
-
+from .modules.pay_bill import payBill
 
 
 app = FastAPI()
@@ -190,3 +190,9 @@ async def recover_password(request: EmailParams):
     status, response = await prepare_email(request.email, 1)
     responseJ = jsonable_encoder(response)
     return JSONResponse(status_code=status, content=responseJ)
+
+@app.post("/pay_bill")
+async def pay_bill(request: payBillModel):
+    status, response = await payBill(request)
+    response = jsonable_encoder(response)
+    return JSONResponse(status_code=status, content=response)
