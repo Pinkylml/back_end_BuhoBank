@@ -50,3 +50,9 @@ class verifyCode(BaseModel):
     codigo: str
     email: EmailStr
     parameter:int
+
+
+class payBillModel(BaseModel):
+    contract: int
+    parameter: int 
+    account: int
