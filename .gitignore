@@ -1,8 +1,22 @@
 # Byte-compiled / optimized / DLL files
-__pycache__/
+/app/__pycache__/
 *.py[cod]
 *$py.class
 
 # Ignore __pycache__ inside app directory
+/app/__pycache__/
 app/__pycache__/
+
+app/__pycache__/
+__pycache__/
+/__pycache__/
 gut
+.vercel
+
+#vercel
+vercel.json
+.vercel
+
+
+#DockerFIle
+Dockerfile

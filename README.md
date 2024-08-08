@@ -35,9 +35,14 @@ pip install -r requirements.txt
 Para ejecutar el servidor de desarrollo:
 
 ```bash
-uvicorn main:app --reload
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
+ten en cuenta que debes estar en la carpeta back_end_BuhoBank/ para que funcione el codigo, si estas dentro de app usa el siguiente:
 
+
+```bash
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
 ## Documentación de la API
 
 Una vez que el servidor esté en ejecución, puedes acceder a la documentación de la API en:
