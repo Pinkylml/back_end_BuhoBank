@@ -55,15 +55,15 @@ async def DoPay(account_source,  contract, amount, params):
                 #Ahora que tenemos los datos de la cuenta de destino y la de origen, procedemos a realizar la transferencia
                 filter_source = {"account_number": int(search_account_src.get("account_number"))}
                 filter_destiny = {"account_number": int(search_account_dest.get("account_number"))}
-                new_balance_dest = search_account_dest.get("balance") + amount
-                new_balance_src = search_account_src.get("balance") - amount
+                new_balance_dest = round(search_account_dest.get("balance") + amount, 2)
+                new_balance_src = round(search_account_src.get("balance") - amount, 2)
                 fecha_movimiento = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 new_movement_src = {
                     "fecha_movimiento": fecha_movimiento,
                     "saldo_entra": 0.0,
                     "saldo_sale": amount,
-                    "saldo_anterior": (search_account_src.get("balance")),
-                    "saldo_resultante": search_account_src.get("balance") - amount,
+                    "saldo_anterior": round((search_account_src.get("balance")), 2),
+                    "saldo_resultante": round(search_account_src.get("balance") - amount,2),
                     "cuenta_origen": int(search_account_src.get("account_number")),
                     "cuenta_destino": int(search_account_dest.get("account_number")),
                     "Descripcion": f"Pago de servicios básicos: {services_str}" 
@@ -73,8 +73,8 @@ async def DoPay(account_source,  contract, amount, params):
                      "fecha_movimiento": fecha_movimiento,
                     "saldo_entra": amount,
                     "saldo_sale": 0.0,
-                    "saldo_anterior": (search_account_dest.get("balance")),
-                    "saldo_resultante": search_account_dest.get("balance") + amount,
+                    "saldo_anterior": round((search_account_dest.get("balance")),2),
+                    "saldo_resultante": round(search_account_dest.get("balance") + amount,2),
                     "cuenta_origen": int(search_account_src.get("account_number")),
                     "cuenta_destino": int(search_account_dest.get("account_number")),
                     "Descripcion": f"Pago de servicios básicos: {services_str}" 

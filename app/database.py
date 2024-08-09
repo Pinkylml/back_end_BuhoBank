@@ -24,6 +24,7 @@ code_verify_collection= database.get_collection("CodigosVerificación")
 reset_verify_colletion= database.get_collection("CodigosVerificaciónReseteo")
 code_transfer_collection=database.get_collection("TransferenciaCodigos")
 
+
 async def create_ttl_index():
     try:
         index = IndexModel([("expiresAt", ASCENDING)], expireAfterSeconds=0)
