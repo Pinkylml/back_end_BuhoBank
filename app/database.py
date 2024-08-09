@@ -3,7 +3,7 @@ from pymongo.errors import ConnectionFailure
 from pymongo import IndexModel, ASCENDING
 
 
-MONGO_DETAILS = "mongodb+srv://buhobanco:cB5W7tVdZxuUQYWN@buhobanco.tpw58ga.mongodb.net/?retryWrites=true&w=majority&appName=BuhoBanco"
+MONGO_DETAILS = "mongodb://localhost:27017"
 
 client = AsyncIOMotorClient(MONGO_DETAILS)
 
@@ -23,6 +23,7 @@ account_collection = database.get_collection("CuentasBancarias")
 code_verify_collection= database.get_collection("CodigosVerificación")
 reset_verify_colletion= database.get_collection("CodigosVerificaciónReseteo")
 code_transfer_collection=database.get_collection("TransferenciaCodigos")
+
 
 async def create_ttl_index():
     try:
