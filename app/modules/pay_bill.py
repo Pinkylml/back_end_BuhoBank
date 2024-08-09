@@ -7,7 +7,7 @@ from datetime import datetime
 #Funcion para obtener el monto. 
 async def getAmount(number_account, param):
     async with httpx.AsyncClient() as client:
-        response = await client.get(f"http://localhost:8001/get_bill_amount/{number_account}/{param}")
+        response = await client.get(f"https://back-endfacturas.onrender.com/get_bill_amount/{number_account}/{param}")
         response_data = response.json()
         monto = response_data.get("monto")
         print(monto)
@@ -22,7 +22,7 @@ async def checkPaid(contratc, params):
             "type_params": str(params)
         }
     async with httpx.AsyncClient() as client:
-        response = await client.post("http://localhost:8001/checkPaid/", json=contratcDic)
+        response = await client.post("https://back-endfacturas.onrender.com/checkPaid/", json=contratcDic)
         response_data = response.json()
         code = response_data.get("Code")
         print(code)
