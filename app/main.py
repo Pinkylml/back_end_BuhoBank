@@ -16,7 +16,7 @@ import random
 from .database import setup_database
 from .modules.sendCodeTransfer import prepareEmailTransfer
 from .modules.pay_bill import payBill
-
+from pydantic import EmailStr
 
 app = FastAPI()
 
@@ -196,3 +196,8 @@ async def pay_bill(request: payBillModel):
     status, response = await payBill(request)
     response = jsonable_encoder(response)
     return JSONResponse(status_code=status, content=response)
+
+@app.get("/recover_user/{email}")
+async def recover_user(email: EmailStr):
+    response = await prepare_email(email, 2)
+    return JSONResponse(content=response)
