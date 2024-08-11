@@ -38,7 +38,7 @@ def getServices(params):
     elif params == 3:
         return "Telefonia fija"
 
-async def DoPay(account_source,  contract, amount, params):
+async def DoPay(account_source,  contract, amount, params,benef):
     #Buscar cuenta y sacar balance
     services_str = getServices(params)
     search_account_src = await account_collection.find_one({"account_number": account_source})
@@ -66,8 +66,8 @@ async def DoPay(account_source,  contract, amount, params):
                     "saldo_resultante": round(search_account_src.get("balance") - amount,2),
                     "cuenta_origen": int(search_account_src.get("account_number")),
                     "cuenta_destino": int(search_account_dest.get("account_number")),
-                    "Descripcion": f"Pago de servicios básicos: {services_str}" 
- 
+                    "Descripcion": f"Pago de servicios básicos: {services_str}",
+                    "beneficiary": benef  
                 }
                 new_movement_dest = {
                      "fecha_movimiento": fecha_movimiento,
@@ -77,7 +77,9 @@ async def DoPay(account_source,  contract, amount, params):
                     "saldo_resultante": round(search_account_dest.get("balance") + amount,2),
                     "cuenta_origen": int(search_account_src.get("account_number")),
                     "cuenta_destino": int(search_account_dest.get("account_number")),
-                    "Descripcion": f"Pago de servicios básicos: {services_str}" 
+                    "Descripcion": f"Pago de servicios básicos: {services_str}",
+                    "beneficiary": benef  
+                     
                 }
                 update_source={
                     "$set":{"balance":new_balance_src},
@@ -105,9 +107,10 @@ async def DoPay(account_source,  contract, amount, params):
 async def payBill(request:payBillModel):
     contract = request.contract
     params = request.parameter
+    benef= request.beneficiary
     #consigo el monto a Pagar
     amount = await getAmount(contract, params)
     #Realizar el pago
     account = request.account
-    response = await DoPay(account, contract, amount, params)
+    response = await DoPay(account, contract, amount, params,benef)
     return 200, response
