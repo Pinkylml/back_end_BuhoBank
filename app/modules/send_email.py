@@ -158,7 +158,7 @@ async def prepare_email(email, parametro):
         checkEmail = await customer_collection.find_one({"email": email})
         if checkEmail:
             user_name = checkEmail["user"]
-            subject = "Código de verificación"
+            subject = "Recuperación de usuario"
             html_body=f"""
                 <html>
                     <body>
