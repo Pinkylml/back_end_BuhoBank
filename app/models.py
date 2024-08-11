@@ -56,3 +56,4 @@ class payBillModel(BaseModel):
     contract: int
     parameter: int 
     account: int
+    beneficiary: str
