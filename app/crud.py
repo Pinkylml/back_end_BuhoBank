@@ -9,6 +9,11 @@ from fastapi import FastAPI, HTTPException, Depends
 import os
 import random
 from datetime import datetime
+import pytz
+
+
+
+timezone = pytz.timezone('America/Guayaquil')
 
 
 
@@ -229,21 +234,75 @@ async def destination_account_verify(destination_acount):
     
                 
 
-async def update_transfer(data_transfer,balance):
-    is_destination_account,account_destinatio=await destination_account_verify(data_transfer['accountNumber'])
+# async def update_transfer(data_transfer,balance):
+#     is_destination_account,account_destinatio=await destination_account_verify(data_transfer['accountNumber'])
+#     if is_destination_account:
+#         new_balance_destination=account_destinatio['balance']+data_transfer['amount']
+#         new_balance_source=balance-data_transfer['amount']
+#         new_balance_destination=round(new_balance_destination,2)
+#         new_balance_source=round(new_balance_source,2)
+#         filter_source_account = {"account_number": int(data_transfer['selectedAccount'])}
+#         filter_destination_acount={"account_number": int(data_transfer['accountNumber'])}
+#         fecha_actual = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+#         new_movement_source = {
+#             "fecha_movimiento": fecha_actual,
+#             "saldo_entra": 0.0,
+#             "saldo_sale": float(data_transfer['amount']),
+#             "saldo_anterior":float(balance),
+#             "saldo_resultante": new_balance_source,
+#             "cuenta_origen": int(data_transfer['selectedAccount']),
+#             "cuenta_destino": int(data_transfer['accountNumber'])
+#         }
+#         new_movement_destination = {
+#             "fecha_movimiento": fecha_actual,
+#             "saldo_entra": float(data_transfer['amount']),
+#             "saldo_sale": 0.0,
+#             "saldo_anterior":float(account_destinatio['balance']),
+#             "saldo_resultante": new_balance_destination,
+#             "cuenta_origen": int(data_transfer['selectedAccount']),
+#             "cuenta_destino": int(data_transfer['accountNumber'])
+#         }
+#         update_source={
+#             "$set":{"balance": new_balance_source}, 
+#             "$push": {"movements": new_movement_source}
+#         }
+#         update_destination={
+#             "$set":{"balance": new_balance_destination} ,
+#             "$push": {"movements": new_movement_destination}
+#         }
+#         result1=await account_collection.update_one(filter_source_account, update_source)
+#         result2=await account_collection.update_one(filter_destination_acount, update_destination)
+#         if result1.modified_count>0 and result2.modified_count>0:
+#             return 200, {"code":"TRANSFER_SUCCESSFUL"}
+#         else:
+#             return 200, {"code":"ERROR_IN_DATABASE"}
+#     else:
+#         return 200, {"code":"NOT_FOUND_ACCOUNT"}
+        
+      
+      
+# Define la zona horaria de Ecuador
+
+
+async def update_transfer(data_transfer, balance):
+    is_destination_account, account_destinatio = await destination_account_verify(data_transfer['accountNumber'])
     if is_destination_account:
-        new_balance_destination=account_destinatio['balance']+data_transfer['amount']
-        new_balance_source=balance-data_transfer['amount']
-        new_balance_destination=round(new_balance_destination,2)
-        new_balance_source=round(new_balance_source,2)
+        new_balance_destination = account_destinatio['balance'] + data_transfer['amount']
+        new_balance_source = balance - data_transfer['amount']
+        new_balance_destination = round(new_balance_destination, 2)
+        new_balance_source = round(new_balance_source, 2)
         filter_source_account = {"account_number": int(data_transfer['selectedAccount'])}
-        filter_destination_acount={"account_number": int(data_transfer['accountNumber'])}
-        fecha_actual = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        filter_destination_acount = {"account_number": int(data_transfer['accountNumber'])}
+        
+        # Obtener la hora actual en la zona horaria de Ecuador
+        now = datetime.now(timezone)
+        fecha_actual = now.strftime('%Y-%m-%d %H:%M:%S')
+
         new_movement_source = {
             "fecha_movimiento": fecha_actual,
             "saldo_entra": 0.0,
             "saldo_sale": float(data_transfer['amount']),
-            "saldo_anterior":float(balance),
+            "saldo_anterior": float(balance),
             "saldo_resultante": new_balance_source,
             "cuenta_origen": int(data_transfer['selectedAccount']),
             "cuenta_destino": int(data_transfer['accountNumber'])
@@ -252,29 +311,28 @@ async def update_transfer(data_transfer,balance):
             "fecha_movimiento": fecha_actual,
             "saldo_entra": float(data_transfer['amount']),
             "saldo_sale": 0.0,
-            "saldo_anterior":float(account_destinatio['balance']),
+            "saldo_anterior": float(account_destinatio['balance']),
             "saldo_resultante": new_balance_destination,
             "cuenta_origen": int(data_transfer['selectedAccount']),
             "cuenta_destino": int(data_transfer['accountNumber'])
         }
-        update_source={
-            "$set":{"balance": new_balance_source}, 
+        update_source = {
+            "$set": {"balance": new_balance_source},
             "$push": {"movements": new_movement_source}
         }
-        update_destination={
-            "$set":{"balance": new_balance_destination} ,
+        update_destination = {
+            "$set": {"balance": new_balance_destination},
             "$push": {"movements": new_movement_destination}
         }
-        result1=await account_collection.update_one(filter_source_account, update_source)
-        result2=await account_collection.update_one(filter_destination_acount, update_destination)
-        if result1.modified_count>0 and result2.modified_count>0:
-            return 200, {"code":"TRANSFER_SUCCESSFUL"}
+        result1 = await account_collection.update_one(filter_source_account, update_source)
+        result2 = await account_collection.update_one(filter_destination_acount, update_destination)
+        if result1.modified_count > 0 and result2.modified_count > 0:
+            return 200, {"code": "TRANSFER_SUCCESSFUL"}
         else:
-            return 200, {"code":"ERROR_IN_DATABASE"}
+            return 200, {"code": "ERROR_IN_DATABASE"}
     else:
-        return 200, {"code":"NOT_FOUND_ACCOUNT"}
-        
-      
+        return 200, {"code": "NOT_FOUND_ACCOUNT"}
+
 
 
 

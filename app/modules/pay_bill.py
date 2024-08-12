@@ -2,9 +2,13 @@ from ..models import payBillModel
 from ..database import account_collection, customer_collection
 import httpx
 from datetime import datetime
+import pytz
 
 #Funciones auxiliares
 #Funcion para obtener el monto. 
+
+timezone = pytz.timezone('America/Guayaquil')
+
 async def getAmount(number_account, param):
     async with httpx.AsyncClient() as client:
         response = await client.get(f"https://back-endfacturas.onrender.com/get_bill_amount/{number_account}/{param}")
@@ -57,7 +61,10 @@ async def DoPay(account_source,  contract, amount, params,benef):
                 filter_destiny = {"account_number": int(search_account_dest.get("account_number"))}
                 new_balance_dest = round(search_account_dest.get("balance") + amount, 2)
                 new_balance_src = round(search_account_src.get("balance") - amount, 2)
-                fecha_movimiento = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                #fecha_movimiento = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                # Obtener la hora actual en la zona horaria de Ecuador
+                now = datetime.now(timezone)
+                fecha_movimiento = now.strftime('%Y-%m-%d %H:%M:%S')
                 new_movement_src = {
                     "fecha_movimiento": fecha_movimiento,
                     "saldo_entra": 0.0,
